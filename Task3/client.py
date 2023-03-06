@@ -3,6 +3,7 @@
 import sys
 from socket import *
 
+# Continually prompt the client for input until the program is terminated
 while True:
     # Getting input from the user and splitting them into individual words
     clientInput = input('Write hostname, server-port, filename: ')

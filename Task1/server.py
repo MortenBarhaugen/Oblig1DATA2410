@@ -1,46 +1,51 @@
-# import socket module
 from socket import *
-import sys  # In order to terminate the program
+import sys  # In order to terminate the program with sys.exit()
 
+# Creating a TCP socket
 serverSocket = socket(AF_INET, SOCK_STREAM)
+
 # Prepare a sever socket
-# Write your code here
 serverPort = 15000
 serverSocket.bind(('127.0.0.1', serverPort))
 serverSocket.listen(1)
-# End of your code
+
+#Keeps the connection open for a client to connect to
 while True:
-    # Establish the connection print('Ready to serve...') connectionSocket, addr =
+    # Establising the connection
     print('Ready to serve...')
+    # Accepting incoming connections
     connectionSocket, addr = serverSocket.accept()
+
+    # Try to run this code block when looking for file
     try:
-        # Write your code here
-        print('test')
-        # End of your code
-        message = connectionSocket.recv(1024)  # Write your code here #End of your code
+        # Receiving the file-name from client
+        message = connectionSocket.recv(1024)
+        # Splitting the request message into words
         filename = message.split()[1]
+        # Opening the file for reading. The [1:] removes the first character of the filename (/)
         f = open(filename[1:])
-        outputdata = f.read()  # Write your code here #End of your code
-        # Send one HTTP header line into socket
-        # Write your code here
+        # Reads the file
+        outputdata = f.read()
+        # Sending HTTP header line into socket
         connectionSocket.send(b'HTTP/1.1 200 OK\r\n\r\n')
-        # End of your code
-        # Send the content of the requested file to the client
+
+        # Sending the content of the requested file to the client
+        # Loops through the file and sends all the encoded lines to client
         for i in range(0, len(outputdata)):
             connectionSocket.send(outputdata[i].encode())
+        # Sending blank line to client that represents the end of the response headers
         connectionSocket.send("\r\n".encode())
+        # Closing the socket
         connectionSocket.close()
+
+    # Handles exceptions (if file not found)
     except IOError:
-        # Send response message for file not found
-        # Write your code here
+        # Sending an error message if the file is not found
         errormsg = 'HTTP/1.1 404 Not Found\r\n\r\n'
         connectionSocket.send(errormsg.encode())
         connectionSocket.close()
-    # End of your code
-    # Close client socket
-    # Write your code here
+    # Closes the client socket
     connectionSocket.close()
-    # End of your code
 
-
-sys.exit()  # Terminate the program after sending the corresponding data
+# Terminating the program
+sys.exit()
